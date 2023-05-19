@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using WeatherService.API.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,17 +7,34 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddWeatherServices(builder.Configuration);
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Add Endpoints API Explorer service which is required for the Swagger
 builder.Services.AddEndpointsApiExplorer();
+
+// Add Swagger services
 builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen(c =>
+//{
+//    c.SwaggerDoc("v1", new() { Title = "WeatherService.API", Version = "v1" });
+//});
 
 var app = builder.Build();
+
+// Enable middleware to serve generated Swagger as a JSON endpoint
+app.UseSwagger();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+
+    // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+    // specifying the Swagger JSON endpoint
     app.UseSwaggerUI();
+    //app.UseSwaggerUI(c =>
+    //{
+    //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherService.API v1");
+    //    //c.RoutePrefix = string.Empty;
+    //});
 }
 
 app.UseHttpsRedirection();
