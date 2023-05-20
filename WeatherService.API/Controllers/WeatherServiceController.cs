@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 using WeatherService.API.Clients;
 
 namespace WeatherService.Controllers;
@@ -90,8 +89,9 @@ public class WeatherServiceController : ControllerBase
             return BadRequest(dateValidationResult);
         }
 
-        var parsedDate = DateOnly.ParseExact(date, _DATEFORMAT, CultureInfo.InvariantCulture);
-        var result = await _weatherApiClient.FetchHistoricalWeather(city, parsedDate);
+        //var parsedDate = DateOnly.ParseExact(date, _DATEFORMAT, CultureInfo.InvariantCulture);
+        //DateTime parsedDate = DateTime.Parse(date);
+        var result = await _weatherApiClient.FetchHistoricalWeather(city, date);
 
         if (result == null)
         {

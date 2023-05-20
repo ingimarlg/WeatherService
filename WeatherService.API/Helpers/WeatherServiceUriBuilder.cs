@@ -23,23 +23,23 @@ public class WeatherServiceUriBuilder
         return builder.Uri;
     }
 
-    internal Uri BuildForecastWeatherUri(string city)
+    internal Uri BuildForecastWeatherUri(string city, int? days = null)
     {
         var builder = new UriBuilder(_baseAddress)
         {
             Path = $"/v1/forecast.json",
-            Query = $"key={_apiKey}&q={HttpUtility.UrlEncode(city)}"
+            Query = $"key={_apiKey}&q={HttpUtility.UrlEncode(city)}" + (days.HasValue ? $"&days={days}" : string.Empty)
         };
 
         return builder.Uri;
     }
 
-    internal Uri BuildHistoryWeatherUri(string city, DateOnly date)
+    internal Uri BuildHistoryWeatherUri(string city, string date)
     {
         var builder = new UriBuilder(_baseAddress)
         {
             Path = $"/v1/history.json",
-            Query = $"key={_apiKey}&q={HttpUtility.UrlEncode(city)}&date={WeatherServiceDateFormat.History(date)}"
+            Query = $"key={_apiKey}&q={HttpUtility.UrlEncode(city)}&date={date}"
         };
 
         return builder.Uri;

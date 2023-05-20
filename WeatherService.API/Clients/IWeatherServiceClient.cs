@@ -1,8 +1,10 @@
-﻿namespace WeatherService.API.Clients;
+﻿using WeatherService.API.Models;
+
+namespace WeatherService.API.Clients;
 
 public interface IWeatherServiceClient
 {
-    Task<string> FetchCurrentWeather(string city);
-    Task<string> FetchForecast(string city);
-    Task<string> FetchHistoricalWeather(string city, DateOnly date);
+    Task<WeatherModel> FetchCurrentWeather(string city);
+    Task<WeatherModel> FetchForecast(string city, int? days = null);
+    Task<WeatherModel> FetchHistoricalWeather(string city, string date);
 }

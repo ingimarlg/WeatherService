@@ -1,5 +1,6 @@
 ﻿using WeatherService.API.Models;
 using WeatherService.API.Helpers;
+using System.Text.Json;
 
 namespace WeatherService.API.Clients;
 
@@ -16,25 +17,33 @@ public class WeatherServiceClient : IWeatherServiceClient
         _uriBuilder = uriBuilder;
     }
 
-    public Task<string> FetchCurrentWeather(string city)
+    public async Task<WeatherModel> FetchCurrentWeather(string city)
     {
         _logger.LogInformation("Fetching current weather data for city {city}", city);
-        return FetchWeatherData(_uriBuilder.BuildCurrentWeatherUri(city));
+
+        var weatherModel = await FetchWeatherData(_uriBuilder.BuildCurrentWeatherUri(city));
+        ArgumentNullException.ThrowIfNull(weatherModel, $"The {nameof(weatherModel)} cannot be null");
+        return weatherModel;
     }
 
-    public Task<string> FetchForecast(string city)
+    public async Task<WeatherModel> FetchForecast(string city, int? days = null)
     {
         _logger.LogInformation("Fetching weather forecast data for city {city}", city);
-        return FetchWeatherData(_uriBuilder.BuildForecastWeatherUri(city));
+
+        var weatherModel = await FetchWeatherData(_uriBuilder.BuildForecastWeatherUri(city, days));
+        ArgumentNullException.ThrowIfNull(weatherModel, $"The {nameof(weatherModel)} cannot be null");
+        return weatherModel;
     }
 
-    public Task<string> FetchHistoricalWeather(string city, DateOnly date)
+    public async Task<WeatherModel> FetchHistoricalWeather(string city, string date)
     {
         _logger.LogInformation("Fetching historical weather data for city {city} and date {date}", city, date);
-        return FetchWeatherData(_uriBuilder.BuildHistoryWeatherUri(city, date));
+        var weatherModel = await FetchWeatherData(_uriBuilder.BuildHistoryWeatherUri(city, date));
+        ArgumentNullException.ThrowIfNull(weatherModel, $"The {nameof(weatherModel)} cannot be null");
+        return weatherModel;
     }
 
-    private async Task<string> FetchWeatherData(Uri requestUri)
+    private async Task<WeatherModel?> FetchWeatherData(Uri requestUri)
     {
         HttpResponseMessage response = new();
         try
@@ -47,7 +56,14 @@ public class WeatherServiceClient : IWeatherServiceClient
             await HandleHttpRequestException(ex, response);
         }
 
-        return await response.Content.ReadAsStringAsync();
+        try
+        {
+            return await response.Content.ReadFromJsonAsync<WeatherModel>();
+        }
+        catch (JsonException)
+        {
+            throw;
+        }
     }
 
     private async Task HandleHttpRequestException(HttpRequestException ex, HttpResponseMessage response)
