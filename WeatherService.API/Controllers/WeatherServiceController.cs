@@ -19,11 +19,11 @@ public class WeatherServiceController : ControllerBase
         _weatherApiClient = weatherApiClient;
     }
 
-    [HttpGet("{city}")]
+    [HttpGet("weather/{city}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetCurrentWeather(string city)
+    public async Task<IActionResult> GetCurrentWeather(string city = "London")
     {
         _logger.LogInformation("Executing {method} for city {city}", 
             nameof(GetCurrentWeather), 
@@ -43,11 +43,11 @@ public class WeatherServiceController : ControllerBase
         return Ok(weatherData);
     }
 
-    [HttpGet("{city}/forecast")]
+    [HttpGet("weather/{city}/forecast")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetForecast(string city)
+    public async Task<IActionResult> GetForecast(string city = "London")
     {
         _logger.LogInformation("Executing {method} for city {city}",
             nameof(GetForecast),
@@ -68,11 +68,11 @@ public class WeatherServiceController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{city}/history/{date}")]
+    [HttpGet("weather/{city}/history/{date}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetHistoricalWeather(string city, string date)
+    public async Task<IActionResult> GetHistoricalWeather(string city = "London", string date = "2023-05-19")
     {
         _logger.LogInformation("Executing {method} for city {city} and date {date}",
             nameof(GetHistoricalWeather),
