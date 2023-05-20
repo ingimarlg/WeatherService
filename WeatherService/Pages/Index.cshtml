@@ -1,10 +1,116 @@
 ﻿@page
+@using System.Globalization;
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
 
-<div class="jumbotron">
-    <h1>.NET 💜 Azure</h1>
-    <p class="lead">Example .NET app to Azure App Service.</p>
+<div class="text-center">
+    <h1 class="display-4">Welcome to the Weather Service</h1>
+    <p>Get current weather, forecasted weather, and historical weather data for a specific city.</p>
+</div>
+
+<div class="card mx-auto p-4 mb-4" style="width: 20vw">
+    <form method="post" class="">
+        <div class="form-group">
+            <label for="FetchType">Choose a weather report type:</label>
+            <select id="selectType" asp-for="FetchType" class="form-control">
+                <option value="">Select...</option>
+                <option value="Current">Current weather report</option>
+                <option value="Forecast">Forecast report</option>
+                <option value="History">Historical weather report</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="City">Enter City Name</label>
+            <input type="text" class="form-control" id="City" name="City" required value="@Model.City">
+        </div>
+        <div class="form-group" id="DateGroup" style="display: none">
+            <label for="Date">Enter Date (for historical data)</label>
+            <input type="date" class="form-control" id="Date" name="Date">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const selectType = document.getElementById("selectType");
+        const dateGroup = document.getElementById("DateGroup");
+
+        function toggleDateGroup() {
+            dateGroup.style.display = selectType.value == "History" ? "block" : "none";
+        }
+
+        selectType.addEventListener('change', toggleDateGroup);
+    </script>
+}
+
+<div class="row">
+    @if (Model.FetchType == "Current" && Model.CurrentWeatherData != null)
+    {
+        <div class="mx-auto" style="width: 100%">
+            <h4 class="card-title">Current weather conditions</h4>
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text">Temperature: @Model.CurrentWeatherData.Current.Temp_C °C</p>
+                    <p class="card-text">Wind: @Model.CurrentWeatherData.Current.Wind_Kph Kph</p>
+                    <p class="card-text">Precip: @Model.CurrentWeatherData.Current.Precip_Mm mm</p>
+                </div>
+            </div>
+            <p class="card-text">U want more info?: <a href="https://www.weatherapi.com/" target="_blank" title="EVERYTHING">json data</a></p>
+        </div>
+    }
+
+    @if (Model.FetchType == "Forecast" && Model.ForecastData != null)
+    {
+        <div class="mx-auto" style="width: 100%">
+            <h4 class="card-title">Forecast for next three days</h4>
+            @foreach (var day in Model.ForecastData.Forecast.Forecastday)
+            {
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <p class="card-text">Date: @DateOnly.ParseExact(day.Date, "yyyy-mm-dd", CultureInfo.InvariantCulture)</p>
+                        <p class="card-text">Temperature (max/min): @day.Day.Maxtemp_C / @day.Day.Mintemp_C °C</p>
+                        <p class="card-text">Wind (max): @day.Day.Maxwind_Kph KpH</p>
+                        <p class="card-text">Total precip: @day.Day.Totalprecip_Mm mm</p>
+                    </div>
+                </div>
+            }
+            <p class="card-text">U want more info?: <a href="https://www.weatherapi.com/" target="_blank" title="EVERYTHING">json data</a></p>
+        </div>
+    }
+
+    @if (Model.FetchType == "History")
+    {
+        if (Model.HistoricalData != null)
+        {
+            <div class="mx-auto" style="width: 100%">
+                <h4 class="card-title">Historical Weather Data</h4>
+                <div class="card">
+                    <div class="card-body">
+                        @{
+                            var day = Model.HistoricalData.Forecast.Forecastday.First();
+                        }
+                        <p class="card-text">Date: @DateOnly.ParseExact(day.Date, "yyyy-mm-dd", CultureInfo.InvariantCulture)</p>
+                        <p class="card-text">Average temperature: @day.Day.Avgtemp_C °C</p>
+                        <p class="card-text">Wind (max): @day.Day.Maxwind_Kph KpH</p>
+                        <p class="card-text">Total precip: @day.Day.Totalprecip_Mm mm</p>
+                    </div>
+                </div>
+                <p class="card-text">U want more info?: <a href="https://www.weatherapi.com/" target="_blank" title="EVERYTHING">json data</a></p>
+            </div>
+        }
+        else if (Model.Date != null)
+        {
+            <div class="mx-auto" style="width: 100%">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Historical Weather Data for @Model.City</h5>
+                        <p class="card-text">Error occurred. Could not fetch historical data</p>
+                    </div>
+                </div>
+            </div>
+        }
+    }
 </div>
