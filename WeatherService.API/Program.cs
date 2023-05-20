@@ -14,11 +14,6 @@ builder.Services.AddControllers();
 // Add Swagger services
 //builder.Services.AddSwaggerGen();
 
-//builder.Services.AddSwaggerGen(c =>
-//{
-//    c.SwaggerDoc("v1", new() { Title = "WeatherService.API", Version = "v1" });
-//});
-
 var app = builder.Build();
 
 // Enable middleware to serve generated Swagger as a JSON endpoint
