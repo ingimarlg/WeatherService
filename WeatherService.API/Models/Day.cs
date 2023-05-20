@@ -17,9 +17,9 @@ public class Day
     public float Avgvis_Miles { get; set; }
     public float Avghumidity { get; set; }
     public int Daily_Will_It_Rain { get; set; }
-    public string Daily_Chance_Of_Rain { get; set; } = string.Empty;
+    public int Daily_Chance_Of_Rain { get; set; }
     public int Daily_Will_It_Snow { get; set; }
-    public string Daily_Chance_Of_Snow { get; set; } = string.Empty;
+    public int Daily_Chance_Of_Snow { get; set; }
     public Condition Condition { get; set; } = new();
     public float Uv { get; set; }
 }

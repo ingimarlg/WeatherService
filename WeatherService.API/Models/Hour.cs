@@ -27,9 +27,9 @@ public class Hour
     public float Dewpoint_C { get; set; }
     public float Dewpoint_F { get; set; }
     public int Will_It_Rain { get; set; }
-    public string Chance_Of_Rain { get; set; } = string.Empty;
+    public int Chance_Of_Rain { get; set; }
     public int Will_It_Snow { get; set; }
-    public string Chance_Of_Snow { get; set; } = string.Empty;
+    public int Chance_Of_Snow { get; set; }
     public float Vis_Km { get; set; }
     public float Vis_Miles { get; set; }
     public float Gust_Mph { get; set; }
