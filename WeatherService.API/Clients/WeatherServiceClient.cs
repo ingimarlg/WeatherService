@@ -1,6 +1,7 @@
 ﻿using WeatherService.API.Models;
 using WeatherService.API.Helpers;
 using System.Text.Json;
+using WeatherService.API.Exceptions;
 
 namespace WeatherService.API.Clients;
 
@@ -60,22 +61,30 @@ public class WeatherServiceClient : IWeatherServiceClient
         {
             return await response.Content.ReadFromJsonAsync<WeatherModel>();
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
-            throw;
+            throw new InternalServerException("Internal server error", ex);
         }
     }
 
     private async Task HandleHttpRequestException(HttpRequestException ex, HttpResponseMessage response)
     {
-        var error = await response.Content.ReadFromJsonAsync<WeatherApiError>();
-        if (error != null)
+        try
         {
-            throw new HttpRequestException(error.ToString());
+            var errorDetails = await response.Content.ReadFromJsonAsync<WeatherApiErrorDetails>();
+            if (errorDetails != null)
+            {
+                errorDetails.StatusCode = ex.StatusCode;
+                var errorDetailsString = errorDetails.ToString();
+                if (errorDetailsString != null)
+                {
+                    throw new WeatherApiException(errorDetails, ex.Message);
+                }
+            }
         }
-        else
+        catch (JsonException)
         {
-            throw ex;
+            throw new InternalServerException("Internal server error", ex);
         }
     }
 }
