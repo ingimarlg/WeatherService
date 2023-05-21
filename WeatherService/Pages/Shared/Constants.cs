@@ -2,7 +2,7 @@
 
 public class Constants
 {
-    public static readonly string AlertSuccess = "AlertSuccess";
-    public static readonly string AlertDanger = "AlertDanger";
-    public static readonly string AlertWarning = "AlertWarning";
+    public static readonly string WEATHER_API_ERROR_CODE = nameof(WEATHER_API_ERROR_CODE);
+    public static readonly string ERROR_MESSAGE = nameof(ERROR_MESSAGE);
+    public static readonly string HTTP_STATUS_CODE = nameof(HTTP_STATUS_CODE);
 }

@@ -12,39 +12,28 @@
 
 <div class="card mx-auto p-4 mb-4" style="width: 20vw">
     <form method="post" class="">
-        <div class="form-group">
+        <div class="form-group mb-2">
             <label for="FetchType">Choose a weather report type:</label>
-            <select id="selectType" asp-for="FetchType" class="form-control">
+            <select id="selectType" asp-for="FetchType" class="form-control" required>
                 <option value="">Select...</option>
                 <option value="Current">Current weather report</option>
                 <option value="Forecast">Forecast report</option>
                 <option value="History">Historical weather report</option>
             </select>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-2">
             <label for="City">Enter City Name</label>
             <input type="text" class="form-control" id="City" name="City" required value="@Model.City">
         </div>
-        <div class="form-group" id="DateGroup" style="display: none">
+        <div class="form-group mb-3" id="DateGroup">
             <label for="Date">Enter Date (for historical data)</label>
             <input type="date" class="form-control" id="Date" name="Date">
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" style="width: 100%">Submit</button>
+        </div>
     </form>
 </div>
-
-@section Scripts {
-    <script>
-        const selectType = document.getElementById("selectType");
-        const dateGroup = document.getElementById("DateGroup");
-
-        function toggleDateGroup() {
-            dateGroup.style.display = selectType.value == "History" ? "block" : "none";
-        }
-
-        selectType.addEventListener('change', toggleDateGroup);
-    </script>
-}
 
 <div class="row">
     @if (Model.FetchType == "Current" && Model.CurrentWeatherData != null)

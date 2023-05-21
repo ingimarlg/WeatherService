@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WeatherService.API.Clients;
+using WeatherService.API.Exceptions;
 using WeatherService.API.Models;
+using WeatherService.Pages.Shared;
 
 public class IndexModel : PageModel
 {
@@ -31,48 +33,56 @@ public class IndexModel : PageModel
     [BindProperty]
     public string FetchType { get; set; } = string.Empty;
 
-    public IActionResult OnGet()
-    {
-        return Page();
-    }
+    public void OnGet() { }
 
-    public async Task OnPostAsync()
+    public async Task<IActionResult> OnPostAsync()
     {
-        if (FetchType == "Current")
+        _logger.LogInformation("Executing request to fetch data");
+        try
         {
-            try
+            if (FetchType == "Current")
             {
                 CurrentWeatherData = await _weatherServiceClient.FetchCurrentWeather(City);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception when fetching current data");
-            }
-        }
-        else if (FetchType == "Forecast")
-        {
-            try
+            else if (FetchType == "Forecast")
             {
                 ForecastData = await _weatherServiceClient.FetchForecast(City, ForecastDays);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception when fetching forecast data");
-            }
-        }
-        else if (FetchType == "History")
-        {
-            try
+            else if (FetchType == "History")
             {
                 if (Date.HasValue)
                 {
                     HistoricalData = await _weatherServiceClient.FetchHistoricalWeather(City, Date.Value.ToString(_DATEFORMAT));
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception when fetching historical data");
-            }
+
+            return Page();
+        }
+        catch (WeatherApiException ex)
+        {
+            _logger.LogError(ex, "Exception when fetching data");
+
+            TempData[Constants.WEATHER_API_ERROR_CODE] = ex.ErrorDetails.Error.Code;
+            TempData[Constants.ERROR_MESSAGE] = ex.ErrorDetails.Error.Message;
+            TempData[Constants.HTTP_STATUS_CODE] = ex.ErrorDetails.StatusCode;
+
+            return RedirectToPage("Error");
+        }
+        catch (InternalServerException ex)
+        {
+            _logger.LogError($"{ex.Message} \nInner exception: {ex.InnerException}");
+
+            TempData[Constants.ERROR_MESSAGE] = ex.Message;
+
+            return RedirectToPage("Error");
+        }
+        catch (Exception ex) 
+        {
+            _logger.LogError($"UNKNOWN exception cought when fetching data! Call the devs! Where are the handcuffs?! {ex.Message} \nInner exception: {ex.InnerException}");
+
+            TempData[Constants.ERROR_MESSAGE] = "UNKNOWN exception cought when fetching data! Call the devs! Where are the handcuffs?!";
+
+            return RedirectToPage("Error");
         }
     }
 }
